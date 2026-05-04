@@ -1,0 +1,78 @@
+name: 'green-pipe'
+description: 'Scan a repository for media assets, optimise via Cloudinary, and open a PR with the results and a bandwidth/carbon report.'
+author: 'babortech'
+
+branding:
+  icon: 'zap'
+  color: 'green'
+
+inputs:
+  cloudinary_cloud_name:
+    description: 'Your Cloudinary cloud name'
+    required: true
+  cloudinary_api_key:
+    description: 'Your Cloudinary API key'
+    required: true
+  cloudinary_api_secret:
+    description: 'Your Cloudinary API secret'
+    required: true
+  threshold:
+    description: 'Minimum % savings for a file to be included in the optimisation (default: 10)'
+    required: false
+    default: '10'
+  create_pr:
+    description: 'Create a pull request with the optimised assets (default: true)'
+    required: false
+    default: 'true'
+  directory:
+    description: 'Directory to scan (default: current directory)'
+    required: false
+    default: '.'
+  monthly_views:
+    description: 'Estimated monthly page views for carbon calculations (default: 1000)'
+    required: false
+    default: '1000'
+  branch:
+    description: 'Branch name for the PR (default: green-pipe/optimise-assets)'
+    required: false
+    default: 'green-pipe/optimise-assets'
+  report_path:
+    description: 'Output path for the sustainability report (default: SUSTAINABILITY_REPORT.md)'
+    required: false
+    default: 'SUSTAINABILITY_REPORT.md'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install green-pipe
+      run: npm install -g green-pipe
+      shell: bash
+
+    - name: Configure git
+      run: |
+        git config --global user.name "Green Pipe Bot"
+        git config --global user.email "green-pipe@users.noreply.github.com"
+      shell: bash
+
+    - name: Run green-pipe scan
+      env:
+        CLOUDINARY_CLOUD_NAME: ${{ inputs.cloudinary_cloud_name }}
+        CLOUDINARY_API_KEY: ${{ inputs.cloudinary_api_key }}
+        CLOUDINARY_API_SECRET: ${{ inputs.cloudinary_api_secret }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        ARGS="--dir ${{ inputs.directory }}"
+        ARGS="$ARGS --threshold ${{ inputs.threshold }}"
+        ARGS="$ARGS --branch ${{ inputs.branch }}"
+        ARGS="$ARGS --report ${{ inputs.report_path }}"
+        ARGS="$ARGS --monthly-views ${{ inputs.monthly_views }}"
+        if [ "${{ inputs.create_pr }}" = "true" ]; then
+          ARGS="$ARGS --pr"
+        fi
+        green-pipe scan $ARGS
+      shell: bash

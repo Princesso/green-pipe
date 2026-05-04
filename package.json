@@ -1,0 +1,43 @@
+{
+  "name": "green-pipe",
+  "version": "1.0.0",
+  "description": "Scans a repository for media assets, optimises them via Cloudinary, and generates a bandwidth and carbon savings report.",
+  "bin": {
+    "green-pipe": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cloudinary",
+    "sustainability",
+    "media-optimisation",
+    "green",
+    "image-compression",
+    "cli",
+    "github-action"
+  ],
+  "author": "babortech",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.1.1",
+    "chalk": "^4.1.2",
+    "cloudinary": "^2.5.1",
+    "commander": "^11.1.0",
+    "dotenv": "^16.4.5",
+    "glob": "^10.4.5",
+    "p-limit": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}
